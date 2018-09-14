@@ -2,6 +2,50 @@
 
 # We follow the setup defined by the CMake files from gtest repository.
 
+### Questions for Build2 Authors ######
+# 1. Is there a way to create aliases for names/targets?
+#    That would help define targets in sub-scopes, then alias them in higher scopes.
+# 2. What is the difference between += and =+ ?
+# 3. Why is "somedi/ : somedir/*" used when "somedir/" does not have a buildfile?
+#    Isn't it inconsistent with the behaviour of build2 when doing "b" in a directory?
+# 4. Why is
+#      cxx.poptions =+ "-I$include_dir"
+#    working but not
+#      lib{lib_a, lib_b}: cxx.poptions =+ "-I$include_dir"
+#     ?
+# 5. When converting a library to build2, I often have to use a submodule with the real sources.
+#    Could you make bdep detect that we use paths from the submodule in buildfile and automatically
+#    update/init the submodule?
+# 6. Same context: Having the submodule next to the buildfile can result in this kind of situation (gtest for example):
+#
+#      ./buildfile
+#      ./src_base/real_repo/projectname/include/projectname/projectname.hpp
+#      ./src_base/real_repo/projectname/include/projectname/submodule.hpp
+#      ./src_base/real_repo/projectname/include/projectname/detail/xxxmodule.hpp
+#      ./src_base/real_repo/projectname/include/projectname/detail/util/dontlookatme.hpp
+#
+#    Default install will put them all in install.root/include
+#      ./include/projectname.hpp
+#      ./include/submodule.hpp
+#      ./include/xxxmodule.hpp
+#      ./include/dontlookatme.hpp
+#
+#    I tried install.subdirs = true but I ended up with:
+#      ./include/real_repo/projectname/include/projectname/projectname.hpp
+#      ./include/real_repo/projectname/include/projectname/submodule.hpp
+#      ./include/real_repo/projectname/include/projectname/detail/xxxmodule.hpp
+#      ./include/real_repo/projectname/include/projectname/detail/util/dontlookatme.hpp
+#
+#    Is there another variable allowing to specify the directory in the path that should be the root in the mirrored install path?
+#    That is, what do I need to do to obtain the following?
+#
+#      ./include/projectname/projectname.hpp
+#      ./include/projectname/submodule.hpp
+#      ./include/projectname/detail/xxxmodule.hpp
+#      ./include/projectname/detail/util/dontlookatme.hpp
+#
+#    (So that it matches the expected install of the original build scripts)
+
 ## GTEST #############
 
 gtest-origin/googletest/
@@ -13,7 +57,6 @@ gtest-origin/googletest/
 
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
 
-  #hxx{*}: install = include/gtest/ WE WILL HAVE ISSUES WITH THIS ONE
   hxx{*}: install.subdirs = true
 }
 
