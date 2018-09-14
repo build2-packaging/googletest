@@ -1,1 +1,1 @@
-./: {*/ -build/} manifest
+./: gtest/ manifest

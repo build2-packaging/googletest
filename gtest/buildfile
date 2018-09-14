@@ -1,15 +1,25 @@
-./ : lib{*}
+./ : gtest-origin/googletest/ gtest-origin/googlemock/
 
 # We follow the setup defined by the CMake files from gtest repository.
 
 ## GTEST #############
-gtest_dir = gtest-origin/googletest/
-gtest_src_dir = $gtest_dir/src/
-gtest_include_dir = $gtest_dir/src/
-gtest_headers = gtest_include_dir/hxx{**}
 
-lib{gtest} : $gtest_src_dir/cxx{gtest-all} $gtest_headers
-lib{gtest_main} : $src_dir/cxx{gtest_main} $gtest_headers
+gtest-origin/googletest/
+{
+  ./ : lib{gtest gtest_main}
 
+  lib{gtest} : src/cxx{gtest-all} include/hxx{**}
+  lib{gtest_main} : src/cxx{gtest_main} lib{gtest}
+
+  cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
+
+  #hxx{*}: install = include/gtest/ WE WILL HAVE ISSUES WITH THIS ONE
+  hxx{*}: install.subdirs = true
+}
 
 ## GMOCK #############
+
+gtest-origin/googlemock/
+{
+  ./ : # ...
+}
