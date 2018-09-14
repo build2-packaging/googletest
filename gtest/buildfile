@@ -1,0 +1,15 @@
+./ : lib{*}
+
+# We follow the setup defined by the CMake files from gtest repository.
+
+## GTEST #############
+gtest_dir = gtest-origin/googletest/
+gtest_src_dir = $gtest_dir/src/
+gtest_include_dir = $gtest_dir/src/
+gtest_headers = gtest_include_dir/hxx{**}
+
+lib{gtest} : $gtest_src_dir/cxx{gtest-all} $gtest_headers
+lib{gtest_main} : $src_dir/cxx{gtest_main} $gtest_headers
+
+
+## GMOCK #############
