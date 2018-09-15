@@ -9,7 +9,7 @@
 #
 # 2. What is the difference between += and =+ ?
 #
-# 3. Why is "somedi/ : somedir/*" used when "somedir/" does not have a buildfile?
+# 3. Why is "somedir/ : somedir/*" used when "somedir/" does not have a buildfile?
 #    Isn't it inconsistent with the behaviour of build2 when doing "b" in a directory?
 #
 # 4. Why is
@@ -67,13 +67,20 @@
 
 gtest-origin/googletest/
 {
-  ./ : lib{gtest} liba{gtest_main}
+  ./ : lib{gtest gtest_main}
 
   lib{gtest} : src/cxx{gtest-all} include/hxx{**}
-  liba{gtest_main} : src/cxx{gtest_main} lib{gtest}
+  lib{gtest} : cxx.export.poptions += "-I$src_base/include"
+
+  lib{gtest_main} : src/cxx{gtest_main} lib{gtest}
+  # lib{gtest_main} : cxx.export.libs = lib{gtest}
 
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
 
+  objs{*}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY
+  lib{*}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY"
+
+  hxx{*}: install         = include/gtest/
   hxx{*}: install.subdirs = true
 }
 
