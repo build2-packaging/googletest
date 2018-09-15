@@ -62,6 +62,15 @@
 #        bdep update
 #    It is a similar surprising weirdness that `b install` have no equivalent in bdep.
 #
+# 8. When a dependency package exists in the configuration being built but do not have a compatible version,
+#    the report is not clear at all that this is the source of the issue and say
+#       error: unknown dependency gtest ^1.8.0 of package libexample
+#       info: repository E:\Projects\build2-libs\libexample appears to be broken
+#       info: or the repository state could be stale
+#    which is all incorrect. First, it might just be that the dependency is missing.
+#    Second, if the dependency is not missing but don't have a compatible version, that's what should be reported,
+#    with the dependency version currently available for this configuration.
+#    Maybe it only happens with '-' versions?
 
 ## GTEST #############
 
@@ -78,7 +87,7 @@ gtest-origin/googletest/
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
 
   objs{*}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY
-  lib{*}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY"
+  libs{*}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY"
 
   hxx{*}: install         = include/gtest/
   hxx{*}: install.subdirs = true
