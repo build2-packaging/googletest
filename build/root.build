@@ -8,3 +8,12 @@ cxx{*}: extension = cc
 # The test target for cross-testing (running tests under Wine, etc).
 #
 test.target = $cxx.target
+
+
+# Question to build2 devs: why arent't these variables not avaialable in export.build?
+gtest_repo = gtest/gtest-origin
+gtest_root = $gtest_repo/googletest
+gmock_root = $gtest_repo/googlemock
+
+info "REPOSITORY: $src_root/$gtest_repo"
+

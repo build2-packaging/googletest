@@ -3,19 +3,25 @@
 # We follow the setup defined by the CMake files from gtest repository.
 
 ### Questions for Build2 Authors ######
+#
 # 1. Is there a way to create aliases for names/targets?
 #    That would help define targets in sub-scopes, then alias them in higher scopes.
+#
 # 2. What is the difference between += and =+ ?
+#
 # 3. Why is "somedi/ : somedir/*" used when "somedir/" does not have a buildfile?
 #    Isn't it inconsistent with the behaviour of build2 when doing "b" in a directory?
+#
 # 4. Why is
 #      cxx.poptions =+ "-I$include_dir"
 #    working but not
 #      lib{lib_a, lib_b}: cxx.poptions =+ "-I$include_dir"
 #     ?
+#
 # 5. When converting a library to build2, I often have to use a submodule with the real sources.
 #    Could you make bdep detect that we use paths from the submodule in buildfile and automatically
 #    update/init the submodule?
+#
 # 6. Same context: Having the submodule next to the buildfile can result in this kind of situation (gtest for example):
 #
 #      ./buildfile
@@ -45,15 +51,26 @@
 #      ./include/projectname/detail/util/dontlookatme.hpp
 #
 #    (So that it matches the expected install of the original build scripts)
+#
+# 7. It is surprising that this works (example inspired by cargo, as pointed by some people I discussed with):
+#        bdep new anyproject
+#        cd anyproject
+#        b
+#    But this does not work:
+#        bdep new anyproject
+#        cd anyproject
+#        bdep update
+#    It is a similar surprising weirdness that `b install` have no equivalent in bdep.
+#
 
 ## GTEST #############
 
 gtest-origin/googletest/
 {
-  ./ : lib{gtest gtest_main}
+  ./ : lib{gtest} liba{gtest_main}
 
   lib{gtest} : src/cxx{gtest-all} include/hxx{**}
-  lib{gtest_main} : src/cxx{gtest_main} lib{gtest}
+  liba{gtest_main} : src/cxx{gtest_main} lib{gtest}
 
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
 
