@@ -1,6 +1,8 @@
 ./ : gtest-origin/googletest/ gtest-origin/googlemock/
+# Previous line: building this directory means building these directories
+# (see below)
 
-# We follow the setup defined by the CMake files from gtest repository.
+# We try to follow the setup defined by the CMake files from gtest repository.
 
 ### Questions for Build2 Authors ######
 #
@@ -71,31 +73,106 @@
 #    Second, if the dependency is not missing but don't have a compatible version, that's what should be reported,
 #    with the dependency version currently available for this configuration.
 #    Maybe it only happens with '-' versions?
+#
+# 9. Request: add ways to manipulate strings (to forge name of targets)
+#    What is missing here: a way to remove something from a name (see samples below).
+#
+
+# NOTE FOR THE READER: jumping into directories (opening scopes) is not usual,
+# I do it here mainly to define the targets close to where all their sources are.
 
 ## GTEST #############
 
-gtest-origin/googletest/
+gtest-origin/googletest/ # Jump into this directory
 {
   ./ : lib{gtest gtest_main}
 
+  # gtest : Google Test library to use in your tests.
   lib{gtest} : src/cxx{gtest-all} include/hxx{**}
+  # Makes sure the include directory is accessible to user code.
   lib{gtest} : cxx.export.poptions += "-I$src_base/include"
 
+  # gtest_main : library defining a main() so that you don't have to duplicate it in each program
   lib{gtest_main} : src/cxx{gtest_main} lib{gtest}
-  # lib{gtest_main} : cxx.export.libs = lib{gtest}
+  # lib{gtest_main} : cxx.export.libs = lib{gtest} # does not work as expected - WHY?
 
+  # All targets here need to have these directories accessible for including.
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
 
-  objs{*}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY
-  libs{*}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY"
+  # DLL import/export symbol macros have to be activated/deactivated depending
+  # on if you are building the dynamic library or linking with it.
+  # Of course these special defines exists only if you use dynamic libraries.
+  objs{*}: cxx.poptions        += -DGTEST_CREATE_SHARED_LIBRARY
+  libs{*}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY
 
+  # Make sure the public headers are installed.
   hxx{*}: install         = include/gtest/
   hxx{*}: install.subdirs = true
+
+  #############################################################
+  # Samples on how to link user tests with gtest or gtest_main.
+  gtest_build_samples = false # By default we don't build them.
+  if $gtest_build_samples
+  {
+    ./ : samples/ # Build all sample executables that we can define below.
+
+    info "BUILDING GTEST SAMPLES"
+    samples/ # For simplicity of naming.
+    {
+      # Each sample starts with a *_unittest.cc file.
+      for sample: cxx{*_unittest}
+      {
+        sample_name = $name($sample)
+        sample_prefix = $sample_name # TODO: make it better once I have a way to operate strings (see below)
+
+        info "GTEST SAMPLE: $sample_name\($sample_prefix\)"
+        # Some samples have more than one .cc file, but they all start with the same name.
+        source_files = {cxx}{$sample_prefix}  # TODO: Why can't I add headers? there is an error
+        exe{$sample_name}: $source_files $sample
+
+        ./ : exe{$sample_name}
+      }
+
+      # Almost all samples use gtest_main to define main().
+      exe{* -sample9_unittest -sample10_unittest}: ../liba{gtest_main}
+      exe{sample9_unittest sample10_unittest}: ../lib{gtest}
+
+      # TODO: use target blocks once supported
+      # exe{*}: # Set configuration to all executables defined here.
+      # {
+      #   dist = true
+      #   install = samples/    # Install them in this directory.
+      # }
+      exe{*}: dist = true
+      exe{*}: install = samples/ # Install them in this directory.
+      exe{*}: test = true # We want to run these samples when testing.
+
+      # TODO: if I had some way to remove the suffix "_unittest" from the sample name,
+      # the sample_prefix would have just the rigth name to glob
+      # and automatically match the files being listed in the CMakeLists.txt file.
+      # Meanwhile I have to add them manually like in the CMakeLists.txt file ...
+      exe{sample1_unittest} : cxx{sample1}
+      exe{sample2_unittest} : cxx{sample2}
+      exe{sample4_unittest} : cxx{sample2}
+      exe{sample5_unittest} : cxx{sample1} # I think it's an error in the original CMakeLists.txt
+
+    }
+
+  }
+
+  #############################################################
+  # Google Test's own tests.
+  gtest_build_tests = false # By default we don't build them.
+  if $gtest_build_tests
+  {
+
+  }
+
 }
 
 ## GMOCK #############
 
-gtest-origin/googlemock/
+gtest-origin/googlemock/ # Jump into this directory
 {
   ./ : # ...
 }
