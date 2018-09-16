@@ -77,6 +77,12 @@
 # 9. Request: add ways to manipulate strings (to forge name of targets)
 #    What is missing here: a way to remove something from a name (see samples below).
 #
+# 10. It is not clear to me how to variable trees to be stored in configuration.
+#     I can persist the config.* values that already exist or that are specified in CLI (using configure).
+#     I can use variables specified from CLI.
+#     I don't seem to be able to test a variable that should not exist in a tree by default.
+#     I can't persist variables that are not config.* (using configure)
+#
 
 # NOTE FOR THE READER: jumping into directories (opening scopes) is not usual,
 # I do it here mainly to define the targets close to where all their sources are.
@@ -94,7 +100,7 @@ gtest-origin/googletest/ # Jump into this directory
 
   # gtest_main : library defining a main() so that you don't have to duplicate it in each program
   lib{gtest_main} : src/cxx{gtest_main} lib{gtest}
-  # lib{gtest_main} : cxx.export.libs = lib{gtest} # does not work as expected - WHY?
+  # lib{gtest_main} : cxx.export.libs = lib{gtest} # TODO: does not work as expected - WHY?
 
   # All targets here need to have these directories accessible for including.
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
@@ -116,21 +122,23 @@ gtest-origin/googletest/ # Jump into this directory
   {
     ./ : samples/ # Build all sample executables that we can define below.
 
-    info "BUILDING GTEST SAMPLES"
+    info "GTEST: BUILDING SAMPLES"
     samples/ # For simplicity of naming.
     {
+      cxx.poptions =+ "-I$src_base" # Makes samples directory headers available.
+
       # Each sample starts with a *_unittest.cc file.
       for sample: cxx{*_unittest}
       {
         sample_name = $name($sample)
         sample_prefix = $sample_name # TODO: make it better once I have a way to operate strings (see below)
 
-        info "GTEST SAMPLE: $sample_name\($sample_prefix\)"
-        # Some samples have more than one .cc file, but they all start with the same name.
-        source_files = {cxx}{$sample_prefix}  # TODO: Why can't I add headers? there is an error
-        exe{$sample_name}: $source_files $sample
+        info "GTEST SAMPLE: $sample_name \($sample_prefix\)"
 
-        ./ : exe{$sample_name}
+        # Some samples have more than one .cc file, but they all start with the same name.
+        exe{$sample_name}: {cxx}{$sample_prefix}
+
+        ./ : exe{$sample_name} # Make sure this sample will be built.
       }
 
       # Almost all samples use gtest_main to define main().
