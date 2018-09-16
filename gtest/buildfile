@@ -83,9 +83,15 @@
 #     I don't seem to be able to test a variable that should not exist in a tree by default.
 #     I can't persist variables that are not config.* (using configure)
 #
+# 11. Knowing which link error report comes from which linking command is almost impossible.
+#     I think I already pointed this: logs from processes specific to a project could be marked
+#     so that even when launched in parallel we can follow what is happening.
+#
 
 # NOTE FOR THE READER: jumping into directories (opening scopes) is not usual,
 # I do it here mainly to define the targets close to where all their sources are.
+# NOTE ABOUT gtest_main: I had to not make it a target but just a variable to use as dependency
+# because the linking step reports a missing entry point when using it. Not sure why yet.
 
 ## GTEST #############
 
@@ -100,7 +106,7 @@ gtest-origin/googletest/ # Jump into this directory
 
   # gtest_main : library defining a main() so that you don't have to duplicate it in each program
   lib{gtest_main} : src/cxx{gtest_main} lib{gtest}
-  # lib{gtest_main} : cxx.export.libs = lib{gtest} # TODO: does not work as expected - WHY?
+  # lib{gtest_main} : cxx.export.libs = lib{gtest} # TODO: does not work as expected - WHY? scoping issue?
 
   # All targets here need to have these directories accessible for including.
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
@@ -139,11 +145,12 @@ gtest-origin/googletest/ # Jump into this directory
         exe{$sample_name}: {cxx}{$sample_prefix}
 
         ./ : exe{$sample_name} # Make sure this sample will be built.
+
       }
 
       # Almost all samples use gtest_main to define main().
       exe{* -sample9_unittest -sample10_unittest}: ../liba{gtest_main}
-      exe{sample9_unittest sample10_unittest}: ../lib{gtest}
+      exe{sample9_unittest sample10_unittest}    : ../lib{gtest}
 
       # TODO: use target blocks once supported
       # exe{*}: # Set configuration to all executables defined here.
@@ -161,7 +168,7 @@ gtest-origin/googletest/ # Jump into this directory
       # Meanwhile I have to add them manually like in the CMakeLists.txt file ...
       exe{sample1_unittest} : cxx{sample1}
       exe{sample2_unittest} : cxx{sample2}
-      exe{sample4_unittest} : cxx{sample2}
+      exe{sample4_unittest} : cxx{sample4}
       exe{sample5_unittest} : cxx{sample1} # I think it's an error in the original CMakeLists.txt
 
     }
