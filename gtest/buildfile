@@ -97,7 +97,7 @@
 
 gtest-origin/googletest/ # Jump into this directory
 {
-  ./ : lib{gtest gtest_main}
+  ./ : lib{gtest} liba{gtest_main}
 
   # gtest : Google Test library to use in your tests.
   lib{gtest} : src/cxx{gtest-all} include/hxx{**}
@@ -105,8 +105,9 @@ gtest-origin/googletest/ # Jump into this directory
   lib{gtest} : cxx.export.poptions += "-I$src_base/include"
 
   # gtest_main : library defining a main() so that you don't have to duplicate it in each program
-  lib{gtest_main} : src/cxx{gtest_main} lib{gtest}
-  # lib{gtest_main} : cxx.export.libs = lib{gtest} # TODO: does not work as expected - WHY? scoping issue?
+  liba{gtest_main} : src/cxx{gtest_main} lib{gtest}  # We only support it as a static library.
+  liba{gtest_main} : bin.whole = true # Do not remove the main() implementation because it is not directly used.
+  # liba{gtest_main} : cxx.export.libs = lib{gtest} # TODO: does not work as expected - WHY? scoping issue?
 
   # All targets here need to have these directories accessible for including.
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
@@ -149,8 +150,16 @@ gtest-origin/googletest/ # Jump into this directory
       }
 
       # Almost all samples use gtest_main to define main().
-      exe{* -sample9_unittest -sample10_unittest}: ../liba{gtest_main}
-      exe{sample9_unittest sample10_unittest}    : ../lib{gtest}
+      # exe{* -sample9_unittest -sample10_unittest}: ../liba{gtest_main} # DO NOT WORK
+      exe{sample1_unittest}: ../liba{gtest_main}
+      exe{sample2_unittest}: ../liba{gtest_main}
+      exe{sample3_unittest}: ../liba{gtest_main}
+      exe{sample4_unittest}: ../liba{gtest_main}
+      exe{sample5_unittest}: ../liba{gtest_main}
+      exe{sample6_unittest}: ../liba{gtest_main}
+      exe{sample7_unittest}: ../liba{gtest_main}
+      exe{sample8_unittest}: ../liba{gtest_main}
+      exe{sample9_unittest sample10_unittest}    : ../lib{gtest} # DOES WORK
 
       # TODO: use target blocks once supported
       # exe{*}: # Set configuration to all executables defined here.
