@@ -87,6 +87,10 @@
 #     I think I already pointed this: logs from processes specific to a project could be marked
 #     so that even when launched in parallel we can follow what is happening.
 #
+# 12. Build logs should always start with the path of the configuration, otherwise sometime we get an error
+#     (like "error: unable to import target gtest%lib{gtest}") without knowing in which configuration directory
+#     we tried to build.
+#
 
 # NOTE FOR THE READER: jumping into directories (opening scopes) is not usual,
 # I do it here mainly to define the targets close to where all their sources are.
