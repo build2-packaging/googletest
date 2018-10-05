@@ -120,7 +120,8 @@ gtest-origin/googletest/ # Jump into this directory
   # on if you are building the dynamic library or linking with it.
   # Of course these special defines exists only if you use dynamic libraries.
   objs{*}: cxx.poptions        += -DGTEST_CREATE_SHARED_LIBRARY
-  libs{*}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY
+  libs{gtest}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY
+  # NOTE: I initially did libs{*} but it can't work apparently (link issues with tests)
 
   # Make sure the public headers are installed.
   hxx{*}: install         = include/gtest/
@@ -128,7 +129,7 @@ gtest-origin/googletest/ # Jump into this directory
 
   #############################################################
   # Samples on how to link user tests with gtest or gtest_main.
-  gtest_build_samples = false # By default we don't build them.
+  gtest_build_samples = true # By default we build them.
   if $gtest_build_samples
   {
     ./ : samples/ # Build all sample executables that we can define below.
@@ -190,10 +191,59 @@ gtest-origin/googletest/ # Jump into this directory
 
   #############################################################
   # Google Test's own tests.
-  gtest_build_tests = false # By default we don't build them.
+  gtest_build_tests = true # By default we build them.
   if $gtest_build_tests
   {
+    ./ : test/ # Build all sample executables that we can define below.
 
+    test/ # For simplicity of naming.
+    {
+      # Note: we reflect the content of CMake's scripts, which apparently do not take
+      # all sources into account, so no loop.
+
+      test_names_with_gtest_main =  googletest-death-test-test     \
+                                    googletest-filepath-test       \
+                                    googletest-linked-ptr-test     \
+                                    gtest_main_unittest            \
+                                    googletest-message-test        \
+                                    googletest-options-test        \
+                                    googletest-port-test           \
+                                    gtest_pred_impl_unittest       \
+                                    googletest-test-part-test      \
+                                    gtest_unittest                 \
+                                    gtest_sole_header_test         \
+                                    googletest-printers-test
+
+      test_names_with_gtest      =  gtest_environment_test         \
+                                    gtest_no_test_unittest         \
+                                    gtest_premature_exit_test      \
+                                    gtest_repeat_test              \
+                                    gtest_stress_test              \
+                                    gtest_throw_on_failure_ex_test \
+                                    gtest-unittest-api_test        \
+                                    googletest-listener-test         # This one was linking with gtest_main in Cmake but it have a main() so it does not link.
+
+      all_tests_names = $test_names_with_gtest_main $test_names_with_gtest
+
+      for test_name : $all_tests_names
+      {
+        info "GTEST TEST: $test_name"
+        ./ : exe{$test_name} # Make sure all tests will be built.
+        exe{$test_name} : cxx{$test_name}
+      }
+
+      exe{$test_names_with_gtest_main} : ../liba{gtest_main}
+      exe{$test_names_with_gtest}      : ../lib{gtest}
+
+      # Special cases:
+      exe{googletest-param-test-test} : cxx{googletest-param-test-test} cxx{googletest-param-test2-test} ../lib{gtest}
+      exe{gtest-typed-test_test} : cxx{gtest-typed-test_test gtest-typed-test2_test} ../liba{gtest_main}
+      exe{gtest_prod_test} : cxx{gtest_prod_test production} ../liba{gtest_main}
+
+      exe{*}: dist = true
+      exe{*}: install = test/ # Install them in this directory.
+      exe{*}: test = true # We want to run these tests when testing.
+    }
   }
 
 }
