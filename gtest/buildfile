@@ -105,6 +105,11 @@ gtest-origin/googletest/ # Jump into this directory
 
   # gtest : Google Test library to use in your tests.
   lib{gtest} : src/cxx{gtest-all} include/hxx{**}
+  # Check inside gtest-all.cc: Looks like some kind of manual "unity build"...
+  # All sources included must be mentionned as headers, even if it looks wrong.
+  lib{gtest} : src/hxx{ gtest.cc gtest-death-test.cc gtest-filepath.cc }
+  lib{gtest} : src/hxx{ gtest-port.cc gtest-printers.cc gtest-test-part.cc }
+  lib{gtest} : src/hxx{ gtest-typed-test.cc }
   # Makes sure the include directory is accessible to user code.
   lib{gtest} : cxx.export.poptions += "-I$src_base/include"
 
