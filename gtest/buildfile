@@ -169,11 +169,11 @@ gtest-origin/googletest/ # Jump into this directory
       # TODO: use target blocks once supported
       # exe{*}: # Set configuration to all executables defined here.
       # {
-      #   dist = true
-      #   install = samples/    # Install them in this directory.
+      #   dist = false
+      #   install = false    # No need to install the samples in package.
       # }
-      exe{*}: dist = true
-      exe{*}: install = samples/ # Install them in this directory.
+      exe{*}: dist = false
+      exe{*}: install = false # No need to install the samples in package.
       exe{*}: test = true # We want to run these samples when testing.
 
       # TODO: if I had some way to remove the suffix "_unittest" from the sample name,
@@ -240,8 +240,8 @@ gtest-origin/googletest/ # Jump into this directory
       exe{gtest-typed-test_test} : cxx{gtest-typed-test_test gtest-typed-test2_test} ../liba{gtest_main}
       exe{gtest_prod_test} : cxx{gtest_prod_test production} ../liba{gtest_main}
 
-      exe{*}: dist = true
-      exe{*}: install = test/ # Install them in this directory.
+      exe{*}: dist = false
+      exe{*}: install = false # Don't install tests
       exe{*}: test = true # We want to run these tests when testing.
     }
   }
