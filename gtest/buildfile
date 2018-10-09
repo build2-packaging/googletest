@@ -104,12 +104,13 @@ gtest-origin/googletest/ # Jump into this directory
   ./ : lib{gtest} liba{gtest_main}
 
   # gtest : Google Test library to use in your tests.
-  lib{gtest} : src/cxx{gtest-all} include/hxx{**} src/hxx{gtest-internal-inl}
+  lib{gtest} : src/cxx{gtest-all} include/hxx{**}
+
   # Check inside gtest-all.cc: Looks like some kind of manual "unity build"...
   # All sources included must be mentionned as headers, even if it looks wrong.
-  lib{gtest} : src/hxx{ gtest.cc gtest-death-test.cc gtest-filepath.cc }
-  lib{gtest} : src/hxx{ gtest-port.cc gtest-printers.cc gtest-test-part.cc }
-  lib{gtest} : src/hxx{ gtest-typed-test.cc }
+  lib{gtest}: src/cxx{* -gtest-all -gtest_main}: include = false
+  lib{gtest}: src/hxx{*}: install = false
+
   # Makes sure the include directory is accessible to user code.
   lib{gtest} : cxx.export.poptions += "-I$src_base/include"
 
@@ -153,7 +154,7 @@ gtest-origin/googletest/ # Jump into this directory
         info "GTEST SAMPLE: $sample_name \($sample_prefix\)"
 
         # Some samples have more than one .cc file, but they all start with the same name.
-        exe{$sample_name}: {cxx}{$sample_prefix}
+        exe{$sample_name}: cxx{$sample_prefix} hxx{*}
 
         ./ : exe{$sample_name} # Make sure this sample will be built.
 
@@ -241,10 +242,11 @@ gtest-origin/googletest/ # Jump into this directory
       exe{$test_names_with_gtest}      : ../lib{gtest}
 
       # Special cases:
-      exe{googletest-param-test-test} : cxx{googletest-param-test-test} cxx{googletest-param-test2-test} ../lib{gtest}
+      exe{googletest-param-test-test} : cxx{googletest-param-test-test googletest-param-test2-test} ../lib{gtest}
       exe{gtest-typed-test_test} : cxx{gtest-typed-test_test gtest-typed-test2_test} ../liba{gtest_main}
       exe{gtest_prod_test} : cxx{gtest_prod_test production} ../liba{gtest_main}
 
+      exe{*}: hxx{*}
       exe{*}: dist = false
       exe{*}: install = false # Don't install tests
       exe{*}: test = true # We want to run these tests when testing.
