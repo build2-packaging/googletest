@@ -1,9 +1,9 @@
 : 1
 name: gtest
-version: 1.8.0-a.1
+version: 1.8.0-a.2.z
 summary: GTest package for Build2
 license: MIT
 url: https://github.com/Klaim/gtest-build2/
 email: mjklaim@gmail.com
-depends: * build2 >= 0.8.0-
-depends: * bpkg >= 0.8.0-
+depends: * build2 >= 0.9.0-
+depends: * bpkg >= 0.9.0-
