@@ -130,8 +130,9 @@ gtest-origin/googletest/ # Jump into this directory
   # NOTE: I initially did libs{*} but it can't work apparently (link issues with tests)
 
   # Make sure the public headers are installed.
-  hxx{*}: install         = include/gtest/
-  hxx{*}: install.subdirs = true
+  hxx{*} : install = false
+  include/hxx{*} : install = include/
+  include/hxx{*} : install.subdirs = true
 
   #############################################################
   # Samples on how to link user tests with gtest or gtest_main.
