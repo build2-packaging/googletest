@@ -1,1 +1,1 @@
-./: gtest/ manifest
+./: gtest/ gmock/ manifest

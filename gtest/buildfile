@@ -1,8 +1,8 @@
+
 upstream = ../upstream
 gtest_dir = $upstream/googletest
-gmock_dir = $upstream/googlemock
 
-./ : $gtest_dir/ $gmock_dir/
+./ : $gtest_dir/
 # Previous line: building this directory means building these directories
 # (see below)
 
@@ -172,11 +172,4 @@ $gtest_dir/ # Jump into this directory
     }
   }
 
-}
-
-## GMOCK #############
-
-$gmock_dir/ # Jump into this directory
-{
-  ./ : # ...
 }

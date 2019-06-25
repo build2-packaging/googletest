@@ -1,0 +1,21 @@
+upstream = ../upstream
+gmock_dir = $upstream/googlemock
+
+./ : $gmock_dir/
+
+# Previous line: building this directory means building these directories
+# (see below)
+
+# We try to follow the setup defined by the CMake files from gtest repository.
+
+# NOTE FOR THE READER: jumping into directories (opening scopes) is not usual,
+# I do it here mainly to define the targets close to where all their sources are.
+# NOTE ABOUT gtest_main: I had to not make it a target but just a variable to use as dependency
+# because the linking step reports a missing entry point when using it. Not sure why yet.
+
+## GMOCK #############
+
+$gmock_dir/ # Jump into this directory
+{
+  ./ : # ...
+}
