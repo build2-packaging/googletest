@@ -17,5 +17,12 @@ gmock_dir = $upstream/googlemock
 
 $gmock_dir/ # Jump into this directory
 {
+  
+  # On unix we need pthread.
+  if ($cxx.target.class != 'windows')
+  {
+    cxx.libs += -lpthread
+  }
+
   ./ : # ...
 }

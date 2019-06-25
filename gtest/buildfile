@@ -17,6 +17,7 @@ gtest_dir = $upstream/googletest
 
 $gtest_dir/ # Jump into this directory
 {
+
   ./ : lib{gtest} liba{gtest_main}
 
   # gtest : Google Test library to use in your tests.
@@ -37,6 +38,12 @@ $gtest_dir/ # Jump into this directory
 
   # All targets here need to have these directories accessible for including.
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
+
+  # On unix we need pthread.
+  if ($cxx.target.class != 'windows')
+  {
+    cxx.libs += -lpthread
+  }
 
   # DLL import/export symbol macros have to be activated/deactivated depending
   # on if you are building the dynamic library or linking with it.
