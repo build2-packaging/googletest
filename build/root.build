@@ -11,7 +11,8 @@ test.target = $cxx.target
 
 
 # Question to build2 devs: why arent't these variables not avaialable in export.build?
-gtest_repo = gtest/gtest-origin
+# => because export.build is used to bridge with importing projects, so it's not used in the same context.
+gtest_repo = $src_root/upstream
 gtest_root = $gtest_repo/googletest
 gmock_root = $gtest_repo/googlemock
 

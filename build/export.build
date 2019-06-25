@@ -3,7 +3,7 @@ $out_root/
   include gtest/
 }
 
-gtest_repo = gtest/gtest-origin
+gtest_repo = $src_root/upstream
 gtest_root = $gtest_repo/googletest
 gmock_root = $gtest_repo/googlemock
 info "EXPORT: $out_root/$gtest_root/$import.target"
