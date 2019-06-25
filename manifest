@@ -1,9 +1,11 @@
 : 1
-name: gtest
-version: 1.8.0-a.2.z
-summary: GTest package for Build2
+name: googletest
+version: 1.8.0
+summary: "Googletest: Google Testing and Mocking Framework"
 license: MIT
-url: https://github.com/Klaim/gtest-build2/
-email: mjklaim@gmail.com
-depends: * build2 >= 0.9.0-
-depends: * bpkg >= 0.9.0-
+url: https://github.com/google/googletest
+package-url: https://github.com/Klaim/gtest-build2/
+package-email: mjklaim@gmail.com
+build-email: mjklaim@gmail.com
+depends: * build2 >= 0.11.0-
+depends: * bpkg >= 0.11.0-

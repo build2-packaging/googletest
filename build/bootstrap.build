@@ -1,4 +1,4 @@
-project = gtest
+project = googletest
 
 using version
 using config
