@@ -48,7 +48,7 @@ $gtest_dir/ # Jump into this directory
   # DLL import/export symbol macros have to be activated/deactivated depending
   # on if you are building the dynamic library or linking with it.
   # Of course these special defines exists only if you use dynamic libraries.
-  objs{*}: cxx.poptions        += -DGTEST_CREATE_SHARED_LIBRARY
+  objs{*}:     cxx.poptions        += -DGTEST_CREATE_SHARED_LIBRARY
   libs{gtest}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY
   # NOTE: I initially did libs{*} but it can't work apparently (link issues with tests)
 
@@ -59,124 +59,117 @@ $gtest_dir/ # Jump into this directory
 
   #############################################################
   # Samples on how to link user tests with gtest or gtest_main.
-  gtest_build_samples = true # By default we build them.
-  if $gtest_build_samples
+
+  ./ : samples/ # Build all sample executables that we can define below.
+
+  # info "GTEST: BUILDING SAMPLES"
+  samples/ # For simplicity of naming.
   {
-    ./ : samples/ # Build all sample executables that we can define below.
+    cxx.poptions =+ "-I$src_base" # Makes samples directory headers available.
 
-    info "GTEST: BUILDING SAMPLES"
-    samples/ # For simplicity of naming.
+    # Each sample starts with a *_unittest.cc file.
+    for sample: cxx{*_unittest}
     {
-      cxx.poptions =+ "-I$src_base" # Makes samples directory headers available.
+      sample_name = $name($sample)
+      sample_prefix = $sample_name # TODO: make it better once I have a way to operate strings (see below)
 
-      # Each sample starts with a *_unittest.cc file.
-      for sample: cxx{*_unittest}
-      {
-        sample_name = $name($sample)
-        sample_prefix = $sample_name # TODO: make it better once I have a way to operate strings (see below)
+      # info "GTEST SAMPLE: $sample_name \($sample_prefix\)"
 
-        info "GTEST SAMPLE: $sample_name \($sample_prefix\)"
+      # Some samples have more than one .cc file, but they all start with the same name.
+      exe{$sample_name}: cxx{$sample_prefix} hxx{*}
 
-        # Some samples have more than one .cc file, but they all start with the same name.
-        exe{$sample_name}: cxx{$sample_prefix} hxx{*}
-
-        ./ : exe{$sample_name} # Make sure this sample will be built.
-
-      }
-
-      # Almost all samples use gtest_main to define main().
-      # exe{* -sample9_unittest -sample10_unittest}: ../liba{gtest_main} # DO NOT WORK
-      exe{sample1_unittest}: ../liba{gtest_main}
-      exe{sample2_unittest}: ../liba{gtest_main}
-      exe{sample3_unittest}: ../liba{gtest_main}
-      exe{sample4_unittest}: ../liba{gtest_main}
-      exe{sample5_unittest}: ../liba{gtest_main}
-      exe{sample6_unittest}: ../liba{gtest_main}
-      exe{sample7_unittest}: ../liba{gtest_main}
-      exe{sample8_unittest}: ../liba{gtest_main}
-      exe{sample9_unittest sample10_unittest}    : ../lib{gtest} # DOES WORK
-
-      # TODO: use target blocks once supported
-      # exe{*}: # Set configuration to all executables defined here.
-      # {
-      #   dist = false
-      #   install = false    # No need to install the samples in package.
-      # }
-      exe{*}: dist = false
-      exe{*}: install = false # No need to install the samples in package.
-      exe{*}: test = true # We want to run these samples when testing.
-
-      # TODO: if I had some way to remove the suffix "_unittest" from the sample name,
-      # the sample_prefix would have just the rigth name to glob
-      # and automatically match the files being listed in the CMakeLists.txt file.
-      # Meanwhile I have to add them manually like in the CMakeLists.txt file ...
-      exe{sample1_unittest} : cxx{sample1}
-      exe{sample2_unittest} : cxx{sample2}
-      exe{sample4_unittest} : cxx{sample4}
-      exe{sample5_unittest} : cxx{sample1} # I think it's an error in the original CMakeLists.txt
+      ./ : exe{$sample_name} # Make sure this sample will be built.
 
     }
+
+    # Almost all samples use gtest_main to define main().
+    # exe{* -sample9_unittest -sample10_unittest}: ../liba{gtest_main} # DO NOT WORK
+    exe{sample1_unittest}: ../liba{gtest_main}
+    exe{sample2_unittest}: ../liba{gtest_main}
+    exe{sample3_unittest}: ../liba{gtest_main}
+    exe{sample4_unittest}: ../liba{gtest_main}
+    exe{sample5_unittest}: ../liba{gtest_main}
+    exe{sample6_unittest}: ../liba{gtest_main}
+    exe{sample7_unittest}: ../liba{gtest_main}
+    exe{sample8_unittest}: ../liba{gtest_main}
+    exe{sample9_unittest sample10_unittest}    : ../lib{gtest} # DOES WORK
+
+    # TODO: use target blocks once supported
+    # exe{*}: # Set configuration to all executables defined here.
+    # {
+    #   dist = false
+    #   install = false    # No need to install the samples in package.
+    # }
+    exe{*}: dist = false
+    exe{*}: install = false # No need to install the samples in package.
+    exe{*}: test = true # We want to run these samples when testing.
+
+    # TODO: if I had some way to remove the suffix "_unittest" from the sample name,
+    # the sample_prefix would have just the rigth name to glob
+    # and automatically match the files being listed in the CMakeLists.txt file.
+    # Meanwhile I have to add them manually like in the CMakeLists.txt file ...
+    exe{sample1_unittest} : cxx{sample1}
+    exe{sample2_unittest} : cxx{sample2}
+    exe{sample4_unittest} : cxx{sample4}
+    exe{sample5_unittest} : cxx{sample1} # I think it's an error in the original CMakeLists.txt
 
   }
 
   #############################################################
   # Google Test's own tests.
-  gtest_build_tests = true # By default we build them.
-  if $gtest_build_tests
+
+  ./ : test/ # Build all tests executables that we can define below.
+
+  test/ # For simplicity of naming.
   {
-    ./ : test/ # Build all sample executables that we can define below.
+    # Note: we reflect the content of CMake's scripts, which apparently do not take
+    # all sources into account, so no loop.
 
-    test/ # For simplicity of naming.
+    test_names_with_gtest_main =  googletest-death-test-test     \
+                                  googletest-filepath-test       \
+                                  googletest-linked-ptr-test     \
+                                  gtest_main_unittest            \
+                                  googletest-message-test        \
+                                  googletest-options-test        \
+                                  googletest-port-test           \
+                                  gtest_pred_impl_unittest       \
+                                  googletest-test-part-test      \
+                                  gtest_unittest                 \
+                                  gtest_sole_header_test         \
+                                  googletest-printers-test
+
+    test_names_with_gtest      =  gtest_environment_test         \
+                                  gtest_no_test_unittest         \
+                                  gtest_premature_exit_test      \
+                                  gtest_repeat_test              \
+                                  gtest_stress_test              \
+                                  gtest_throw_on_failure_ex_test \
+                                  gtest-unittest-api_test        \
+                                  googletest-listener-test         # This one was linking with gtest_main in Cmake but it have a main() so it does not link.
+
+    all_tests_names = $test_names_with_gtest_main $test_names_with_gtest
+
+    for test_name : $all_tests_names
     {
-      # Note: we reflect the content of CMake's scripts, which apparently do not take
-      # all sources into account, so no loop.
+      # info "GTEST TEST: $test_name"
+      ./ : exe{$test_name} # Make sure all tests will be built.
+      exe{$test_name} : cxx{$test_name}
 
-      test_names_with_gtest_main =  googletest-death-test-test     \
-                                    googletest-filepath-test       \
-                                    googletest-linked-ptr-test     \
-                                    gtest_main_unittest            \
-                                    googletest-message-test        \
-                                    googletest-options-test        \
-                                    googletest-port-test           \
-                                    gtest_pred_impl_unittest       \
-                                    googletest-test-part-test      \
-                                    gtest_unittest                 \
-                                    gtest_sole_header_test         \
-                                    googletest-printers-test
-
-      test_names_with_gtest      =  gtest_environment_test         \
-                                    gtest_no_test_unittest         \
-                                    gtest_premature_exit_test      \
-                                    gtest_repeat_test              \
-                                    gtest_stress_test              \
-                                    gtest_throw_on_failure_ex_test \
-                                    gtest-unittest-api_test        \
-                                    googletest-listener-test         # This one was linking with gtest_main in Cmake but it have a main() so it does not link.
-
-      all_tests_names = $test_names_with_gtest_main $test_names_with_gtest
-
-      for test_name : $all_tests_names
-      {
-        info "GTEST TEST: $test_name"
-        ./ : exe{$test_name} # Make sure all tests will be built.
-        exe{$test_name} : cxx{$test_name}
-
-        exe{$test_name}: hxx{*}
-        exe{$test_name}: dist = false
-        exe{$test_name}: install = false # Don't install tests
-        exe{$test_name}: test = true # We want to run these tests when testing.
-      }
-
-      exe{$test_names_with_gtest_main} : ../liba{gtest_main}
-      exe{$test_names_with_gtest}      : ../lib{gtest}
-
-      # Special cases:
-      exe{googletest-param-test-test} : cxx{googletest-param-test-test googletest-param-test2-test} ../lib{gtest}
-      exe{gtest-typed-test_test} : cxx{gtest-typed-test_test gtest-typed-test2_test} ../liba{gtest_main}
-      exe{gtest_prod_test} : cxx{gtest_prod_test production} ../liba{gtest_main}
-
-
+      exe{$test_name}: hxx{*}
+      exe{$test_name}: dist = false
+      exe{$test_name}: install = false # Don't install tests
+      exe{$test_name}: test = true # We want to run these tests when testing.
     }
+
+    exe{$test_names_with_gtest_main} : ../liba{gtest_main}
+    exe{$test_names_with_gtest}      : ../lib{gtest}
+
+    # Special cases:
+    exe{googletest-param-test-test} : cxx{googletest-param-test-test googletest-param-test2-test} ../lib{gtest}
+    exe{gtest-typed-test_test} : cxx{gtest-typed-test_test gtest-typed-test2_test} ../liba{gtest_main}
+    exe{gtest_prod_test} : cxx{gtest_prod_test production} ../liba{gtest_main}
+
+
   }
 
 }
