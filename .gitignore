@@ -19,3 +19,5 @@
 *.exe.dlls/
 *.exe.manifest
 *.pc
+samples/build/bootstrap/
+tests/build/bootstrap/

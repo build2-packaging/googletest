@@ -1,1 +1,1 @@
-./: gtest/ gmock/ manifest
+./: { */ -build/ -upstream/ } manifest
