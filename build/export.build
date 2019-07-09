@@ -1,7 +1,25 @@
 $out_root/
 {
   include gtest/
+  include gmock/
 }
 
-export $out_root/gtest/$import.target # Currently all libraries are there.
+upstream = upstream
+gtest_root = $upstream/googletest
+gmock_root = $upstream/googlemock
+
+#info "EXPORT: $out_root/$gtest_root/$import.target"
+
+export $out_root/$gtest_root/$import.target
+
 # TODO: WHAT TO DO TO EXPORT BOTH GMOCK AND GTEST TARGETS ???
+
+
+############### Written this way, I get a weird error:
+# upstream = $out_root/upstream
+# gtest_root = $upstream/googletest
+# gmock_root = $upstream/googlemock
+#
+# #info "EXPORT: $gtest_root/$import.target"
+#
+# export $gtest_root/$import.target
