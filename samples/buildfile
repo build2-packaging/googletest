@@ -2,14 +2,15 @@
 #############################################################
 # Samples on how to link user tests with gtest or gtest_main.
 
-import lib_gtest = googletest%lib{gtest}
-import lib_gtest_main = googletest%liba{gtest_main}
-
 upstream = ../upstream
 gtest_dir = $upstream/googletest
 
+./ : $gtest_dir/samples/
 $gtest_dir/samples/ # Jump into this directory
 {
+  import lib_gtest = googletest%lib{gtest}
+  import lib_gtest_main = googletest%liba{gtest_main}
+
   cxx.poptions =+ "-I$src_base" # Makes samples directory headers available.
 
   # Each sample starts with a *_unittest.cc file.
@@ -28,10 +29,12 @@ $gtest_dir/samples/ # Jump into this directory
   }
 
   # Almost all samples use gtest_main to define main().
-  # exe{* -sample9_unittest -sample10_unittest}: $lib_gtest_main # DO NOT WORK
+  # exe{* -sample9_unittest -sample10_unittest}: $lib_gtest_main # DOES NOT WORK
   for idx: 1 2 3 4 5 6 7 8 # How to simplify that?
   {
-    exe{"sample$idx_unittest"}: $lib_gtest_main
+    sample_name = sample$(idx)_unittest
+    # info "SAMPLE: $sample_name"
+    exe{$sample_name}: $lib_gtest_main $lib_gtest
   }
   exe{sample9_unittest sample10_unittest} : $lib_gtest # DOES WORK
 

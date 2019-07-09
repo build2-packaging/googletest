@@ -1,14 +1,15 @@
 #############################################################
 # Google Test's own tests.
 
-import lib_gtest = googletest%lib{gtest}
-import lib_gtest_main = googletest%liba{gtest_main}
-
 upstream = ../upstream
 gtest_dir = $upstream/googletest
 
+./ : $gtest_dir/test/
 $gtest_dir/test/ # Jump into this directory
 {
+  import lib_gtest = googletest%lib{gtest}
+  import lib_gtest_main = googletest%liba{gtest_main}
+
   # Note: we reflect the content of CMake's scripts, which apparently do not take
   # all sources into account, so no loop.
 
@@ -39,20 +40,18 @@ $gtest_dir/test/ # Jump into this directory
   for test_name : $all_tests_names
   {
     # info "GTEST TEST: $test_name"
-    ./ : exe{$test_name} # Make sure all tests will be built.
-    exe{$test_name} : cxx{$test_name}
-
-    exe{$test_name}: hxx{*}
-    exe{$test_name}:
-    {
-      dist = false
-      install = false # Don't install tests
-      test = true # We want to run these tests when testing.
-    }
+    ./ : exe{$test_name} : cxx{$test_name} hxx{*}
   }
 
-  exe{$test_names_with_gtest_main} : $lib_gtest_main
-  exe{$test_names_with_gtest}      : $lib_gtest
+  exe{*}:
+  {
+    dist = false
+    install = false # Don't install tests
+    test = true # We want to run these tests when testing.
+  }
+
+  exe{$test_names_with_gtest_main} : $lib_gtest_main $lib_gtest
+  exe{$test_names_with_gtest}     : $lib_gtest
 
   # Special cases:
   exe{googletest-param-test-test} : cxx{googletest-param-test-test googletest-param-test2-test} $lib_gtest

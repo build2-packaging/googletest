@@ -1,1 +1,5 @@
 project = # unnamed for tests
+
+using config
+using test
+using dist

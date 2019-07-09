@@ -17,7 +17,6 @@ gtest_dir = $upstream/googletest
 
 $gtest_dir/ # Jump into this directory
 {
-
   ./ : lib{gtest} liba{gtest_main}
 
   # gtest : Google Test library to use in your tests.
@@ -32,8 +31,8 @@ $gtest_dir/ # Jump into this directory
   lib{gtest} : cxx.export.poptions += "-I$src_base/include"
 
   # gtest_main : library defining a main() so that you don't have to duplicate it in each program
-  liba{gtest_main} : src/cxx{gtest_main} lib{gtest}  # We only support it as a static library.
-  liba{gtest_main} : bin.whole = true # Do not remove the main() implementation because it is not directly used.
+  liba{gtest_main} : src/cxx{gtest_main} # We only support it as a static utility library (no content stripping).
+  liba{gtest_main} : bin.whole = true  # Keep the definition of main()
 
   # All targets here need to have these directories accessible for including.
   cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
@@ -47,13 +46,15 @@ $gtest_dir/ # Jump into this directory
   # DLL import/export symbol macros have to be activated/deactivated depending
   # on if you are building the dynamic library or linking with it.
   # Of course these special defines exists only if you use dynamic libraries.
-  objs{*}:     cxx.poptions        += -DGTEST_CREATE_SHARED_LIBRARY
-  libs{gtest}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY
-  # NOTE: I initially did libs{*} but it can't work apparently (link issues with tests)
+  objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
+  libs{gtest}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY=1"
 
   # Make sure the public headers are installed.
   hxx{*} : install = false
-  include/hxx{*} : install = include/
-  include/hxx{*} : install.subdirs = true
+  include/hxx{*} :
+  {
+    install = include/
+    install.subdirs = true
+  }
 
 }
