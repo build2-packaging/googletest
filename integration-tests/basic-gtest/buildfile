@@ -1,0 +1,5 @@
+
+import dependencies = googletest%lib{gtest} googletest%liba{gtest_main}
+
+exe{basic-gtest} : {hxx cxx}{**} $dependencies
+
