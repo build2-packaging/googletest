@@ -1,60 +1,51 @@
 
-upstream = ../upstream
-gtest_dir = $upstream/googletest
-
-./ : $gtest_dir/
-# Previous line: building this directory means building these directories
-# (see below)
 
 # We try to follow the setup defined by the CMake files from gtest repository.
 
-# NOTE FOR THE READER: jumping into directories (opening scopes) is not usual,
-# I do it here mainly to define the targets close to where all their sources are.
-# NOTE ABOUT gtest_main: I had to not make it a target but just a variable to use as dependency
-# because the linking step reports a missing entry point when using it. Not sure why yet.
-
 ## GTEST #############
 
-$gtest_dir/ # Jump into this directory
+# gtest : Google Test library to use in your tests.
+lib{gtest} : $gtest_src_dir/cxx{gtest-all} $gtest_include_dir/hxx{**}
+
+# Check inside gtest-all.cc: Looks like some kind of manual "unity build"...
+# All sources included must be mentionned as headers, even if it looks wrong.
+lib{gtest}: $gtest_src_dir/cxx{* -gtest-all -gtest_main}: include = false
+lib{gtest}: $gtest_src_dir/hxx{*}: install = false
+
+# Makes sure the include directory is accessible to user code.
+lib{gtest} : cxx.export.poptions += "-I$gtest_include_dir"
+
+# gtest_main : library defining a main() so that you don't have to duplicate it in each program
+./ : liba{gtest_main} : $gtest_src_dir/cxx{gtest_main} # We only support it as a static utility library (no content stripping).
+liba{gtest_main} : bin.whole = true  # Keep the definition of main()
+
+# On unix we need pthread.
+if ($cxx.target.class != 'windows')
 {
-  ./ : lib{gtest} liba{gtest_main}
-
-  # gtest : Google Test library to use in your tests.
-  lib{gtest} : src/cxx{gtest-all} include/hxx{**}
-
-  # Check inside gtest-all.cc: Looks like some kind of manual "unity build"...
-  # All sources included must be mentionned as headers, even if it looks wrong.
-  lib{gtest}: src/cxx{* -gtest-all -gtest_main}: include = false
-  lib{gtest}: src/hxx{*}: install = false
-
-  # Makes sure the include directory is accessible to user code.
-  lib{gtest} : cxx.export.poptions += "-I$src_base/include"
-
-  # gtest_main : library defining a main() so that you don't have to duplicate it in each program
-  liba{gtest_main} : src/cxx{gtest_main} # We only support it as a static utility library (no content stripping).
-  liba{gtest_main} : bin.whole = true  # Keep the definition of main()
-
-  # All targets here need to have these directories accessible for including.
-  cxx.poptions =+ "-I$src_base/include" "-I$src_base/src" "-I$src_base"
-
-  # On unix we need pthread.
-  if ($cxx.target.class != 'windows')
-  {
-    cxx.libs += -lpthread
-  }
-
-  # DLL import/export symbol macros have to be activated/deactivated depending
-  # on if you are building the dynamic library or linking with it.
-  # Of course these special defines exists only if you use dynamic libraries.
-  objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
-  libs{gtest}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY=1"
-
-  # Make sure the public headers are installed.
-  hxx{*} : install = false
-  include/hxx{*} :
-  {
-    install = include/
-    install.subdirs = true
-  }
-
+  cxx.libs += -lpthread
 }
+
+# All targets here need to have these directories accessible for including.
+cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_src_dir" "-I$src_base"
+
+# Sources from the upstream directory also need some dirs to be accessible
+../upstream/googletest/
+{
+  cxx.poptions =+ "-I$gtest_include_dir" "-I$gtest_dir"
+}
+
+# DLL import/export symbol macros have to be activated/deactivated depending
+# on if you are building the dynamic library or linking with it.
+# Of course these special defines exists only if you use dynamic libraries.
+objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
+libs{gtest}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY=1"
+
+# Make sure the public headers are installed.
+hxx{*} : install = false
+include/hxx{*} :
+{
+  install = include/
+  install.subdirs = true
+}
+
+
