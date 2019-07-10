@@ -19,12 +19,6 @@ lib{gtest} : cxx.export.poptions += "-I$gtest_include_dir"
 ./ : liba{gtest_main} : $gtest_src_dir/cxx{gtest_main} # We only support it as a static utility library (no content stripping).
 liba{gtest_main} : bin.whole = true  # Keep the definition of main()
 
-# On unix we need pthread.
-if ($cxx.target.class != 'windows')
-{
-  cxx.libs += -lpthread
-}
-
 # All targets here need to have these directories accessible for including.
 cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_src_dir" "-I$src_base"
 
