@@ -1,6 +1,6 @@
 : 1
 name: googletest
-version: 1.8.1
+version: 1.8.1+1
 summary: "Googletest: Google Testing and Mocking Framework"
 license: MIT
 url: https://github.com/google/googletest
