@@ -32,6 +32,7 @@ cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_sr
 ../upstream/googletest/
 {
   cxx.poptions =+ "-I$gtest_include_dir" "-I$gtest_dir"
+  objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
 }
 
 # DLL import/export symbol macros have to be activated/deactivated depending
