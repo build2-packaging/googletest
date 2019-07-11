@@ -1,5 +1,14 @@
 # We try to follow the setup defined by the CMake files from gtest repository.
 
+
+# info "upstream = $upstream"
+# info "gtest_dir = $gtest_dir"
+# info "gtest_src_dir = $gtest_src_dir"
+# info "gtest_include_dir = $gtest_include_dir"
+# info "gtest_tests_dir = $gtest_tests_dir"
+# info "gtest_samples_dir = $gtest_samples_dir"
+
+
 ## GTEST #############
 
 # gtest : Google Test library to use in your tests.
@@ -22,7 +31,7 @@ liba{gtest_main} : cxx.export.libs += lib{gtest} # Users must also despend on gt
 cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_src_dir" "-I$src_base"
 
 # Sources from the upstream directory also need some dirs to be accessible
-../upstream/googletest/
+../upstream/googletest/ # NOTE: variables are not passed through non-direct sub-directories. :/
 {
   cxx.poptions =+ "-I$gtest_include_dir" "-I$gtest_dir"
   objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
