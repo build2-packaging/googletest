@@ -2,7 +2,7 @@
 import gtest_main = googletest%liba{gtest_main}
 import gtest = googletest%lib{gtest}
 
-exe{basic1-gtest} : cxx{basic1} $gtest_main $gtest # TODO: find why gtest is necessary here when gtest_main is already exposing it as an interface dependency
-exe{basic2-gtest} : cxx{basic2} $gtest
+./ : exe{basic1-gtest} : cxx{basic1} $gtest_main $gtest # TODO: find why gtest is necessary here when gtest_main is already exposing it as an interface dependency
+./ : exe{basic2-gtest} : cxx{basic2} $gtest
 
 
