@@ -6,8 +6,12 @@ hxx{*}: extension = hxx
 cxx{*}: extension = cxx
 
 # Every exe{} in this subproject is by default a test.
-#
-exe{*}: test = true
+# They should not be installed by default.
+exe{*}:
+{
+  test = true
+  install = false
+}
 
 # The test target for cross-testing (running tests under Wine, etc).
 #
