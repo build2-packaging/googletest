@@ -1,6 +1,5 @@
 # We try to follow the setup defined by the CMake files from gtest repository.
 
-
 # info "upstream = $upstream"
 # info "gtest_dir = $gtest_dir"
 # info "gtest_src_dir = $gtest_src_dir"
@@ -10,32 +9,25 @@
 
 
 ## GTEST #############
+./ : lib{gtest} liba{gtest_main}
 
 # gtest : Google Test library to use in your tests.
 lib{gtest} : $gtest_src_dir/cxx{gtest-all} $gtest_include_dir/hxx{**}
 
 # Check inside gtest-all.cc: Looks like some kind of manual "unity build"...
 # All sources included must be mentionned as headers, even if it looks wrong.
-lib{gtest}: $gtest_src_dir/cxx{* -gtest-all -gtest_main}: include = false
-lib{gtest}: $gtest_src_dir/hxx{*}: install = false
+lib{gtest} : $gtest_src_dir/cxx{* -gtest-all -gtest_main}: include = false
 
 # Makes sure the include directory is accessible to user code.
 lib{gtest} : cxx.export.poptions += "-I$gtest_include_dir"
 
 # gtest_main : library defining a main() so that you don't have to duplicate it in each program
-./ : liba{gtest_main} : $gtest_src_dir/cxx{gtest_main} lib{gtest} # We only support it as a static utility library (no content stripping).
+liba{gtest_main} : $gtest_src_dir/cxx{gtest_main} lib{gtest} # We only support it as a static utility library (no content stripping).
 liba{gtest_main} : bin.whole = true  # Keep the definition of main()
 liba{gtest_main} : cxx.export.libs += lib{gtest} # Users must also despend on gtest library.
 
 # All targets here need to have these directories accessible for including.
 cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_src_dir" "-I$src_base"
-
-# Sources from the upstream directory also need some dirs to be accessible
-../upstream/googletest/ # NOTE: variables are not passed through non-direct sub-directories. :/
-{
-  cxx.poptions =+ "-I$gtest_include_dir" "-I$gtest_dir"
-  objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
-}
 
 # DLL import/export symbol macros have to be activated/deactivated depending
 # on if you are building the dynamic library or linking with it.
@@ -43,12 +35,18 @@ cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_sr
 objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
 libs{gtest}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY=1"
 
+# Sources from the upstream directory also need some dirs to be accessible
+../upstream/googletest/ # NOTE: variables are not passed through non-direct sub-directories. :/
+{ # TODO Why this doesnt work in the previous line? : $gtest_dir/
+  cxx.poptions =+ "-I$gtest_include_dir" "-I$gtest_dir"
+  objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
+}
+
 # Make sure the public headers are installed.
-hxx{*} : install = false
-include/hxx{*} :
+# Install headers from that include directory.
+../upstream/googletest/include/hxx{*}: # TODO: why this doesnt work: $gtest_include_dir/hxx{*}:
 {
   install = include/
   install.subdirs = true
 }
-
 
