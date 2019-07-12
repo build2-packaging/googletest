@@ -17,6 +17,7 @@ lib{gtest} : $gtest_src_dir/cxx{gtest-all} $gtest_include_dir/hxx{**}
 # Check inside gtest-all.cc: Looks like some kind of manual "unity build"...
 # All sources included must be mentionned as headers, even if it looks wrong.
 lib{gtest} : $gtest_src_dir/cxx{* -gtest-all -gtest_main}: include = false
+lib{gtest}: $gtest_src_dir/hxx{*}: install = false
 
 # Makes sure the include directory is accessible to user code.
 lib{gtest} : cxx.export.poptions += "-I$gtest_include_dir"
@@ -48,5 +49,9 @@ libs{gtest}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY=1"
 {
   install = include/
   install.subdirs = true
+}
+../upstream/googletest/src/hxx{*}: # TODO: why this doesnt work: $gtest_src_dir/hxx{*}:
+{
+  install = false
 }
 
