@@ -51,7 +51,7 @@ exe{*}:
 }
 
 exe{$test_names_with_gtest_main} : $lib_gtest_main
-exe{$test_names_with_gtest}     : $lib_gtest
+exe{$test_names_with_gtest}      : $lib_gtest
 
 # Special cases:
 exe{googletest-param-test-test} : $gtest_tests_dir/cxx{googletest-param-test-test googletest-param-test2-test} $lib_gtest

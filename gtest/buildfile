@@ -23,9 +23,8 @@ lib{gtest}: $gtest_src_dir/hxx{*}: install = false
 lib{gtest} : cxx.export.poptions += "-I$gtest_include_dir"
 
 # gtest_main : library defining a main() so that you don't have to duplicate it in each program
-liba{gtest_main} : $gtest_src_dir/cxx{gtest_main} lib{gtest} # We only support it as a static utility library (no content stripping).
+liba{gtest_main} : $gtest_src_dir/cxx{gtest_main} # We only support it as a static utility library (no content stripping).
 liba{gtest_main} : bin.whole = true  # Keep the definition of main()
-liba{gtest_main} : cxx.export.libs += lib{gtest} # Users must also despend on gtest library.
 
 # All targets here need to have these directories accessible for including.
 cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_src_dir" "-I$src_base"
@@ -33,8 +32,9 @@ cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_sr
 # DLL import/export symbol macros have to be activated/deactivated depending
 # on if you are building the dynamic library or linking with it.
 # Of course these special defines exists only if you use dynamic libraries.
-objs{*}: cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
-libs{gtest}: cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY=1"
+objs{*} : cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
+libs{gtest} : cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY=1"
+liba{gtest_main} : cxx.export.libs += lib{gtest} # Users must also require the gtest library.
 
 # Sources from the upstream directory also need some dirs to be accessible
 ../upstream/googletest/ # NOTE: variables are not passed through non-direct sub-directories. :/
