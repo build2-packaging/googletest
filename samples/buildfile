@@ -31,7 +31,7 @@ for idx: 1 2 3 4 5 6 7 8 # How to simplify that?
 {
   sample_name = sample$(idx)_unittest
   # info "SAMPLE: $sample_name"
-  exe{$sample_name}: $lib_gtest_main
+  exe{$sample_name}: $lib_gtest $lib_gtest_main
 }
 exe{sample9_unittest sample10_unittest} : $lib_gtest # DOES WORK
 

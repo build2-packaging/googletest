@@ -50,12 +50,12 @@ exe{*}:
   test = true # We want to run these tests when testing.
 }
 
-exe{$test_names_with_gtest_main} : $lib_gtest_main
+exe{$test_names_with_gtest_main} : $lib_gtest $lib_gtest_main
 exe{$test_names_with_gtest}      : $lib_gtest
 
 # Special cases:
 exe{googletest-param-test-test} : $gtest_tests_dir/cxx{googletest-param-test-test googletest-param-test2-test} $lib_gtest
-exe{gtest-typed-test_test} : $gtest_tests_dir/cxx{gtest-typed-test_test gtest-typed-test2_test} $lib_gtest_main
-exe{gtest_prod_test} : $gtest_tests_dir/cxx{gtest_prod_test production} $lib_gtest_main
+exe{gtest-typed-test_test} : $gtest_tests_dir/cxx{gtest-typed-test_test gtest-typed-test2_test} $lib_gtest $lib_gtest_main
+exe{gtest_prod_test} : $gtest_tests_dir/cxx{gtest_prod_test production} $lib_gtest $lib_gtest_main
 
 
