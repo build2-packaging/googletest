@@ -34,7 +34,7 @@ cxx.poptions =+ "-I$out_root" "-I$gtest_include_dir" "-I$gtest_dir" "-I$gtest_sr
 # Of course these special defines exists only if you use dynamic libraries.
 objs{*} : cxx.poptions += "-DGTEST_CREATE_SHARED_LIBRARY=1"
 libs{gtest} : cxx.export.poptions += "-DGTEST_LINKED_AS_SHARED_LIBRARY=1"
-liba{gtest} : cxx.export.poptions += 
+liba{gtest} : cxx.export.poptions += # TODO: check why this line is necessary for liba{gtest} to exist when configuring as a dependency
 
 # Sources from the upstream directory also need some dirs to be accessible
 ../upstream/googletest/ # NOTE: variables are not passed through non-direct sub-directories. :/
