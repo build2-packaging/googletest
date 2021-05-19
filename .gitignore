@@ -1,5 +1,9 @@
 .bdep/
 
+# IDE
+.vscode
+.vs
+
 # Compiler/linker output.
 #
 *.d

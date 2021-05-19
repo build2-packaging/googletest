@@ -1,7 +1,7 @@
-cxx.std = latest
+cxx.std = 11
 using cxx
 
-h{*}: extension = h
+hxx{*}: extension = h
 cxx{*}: extension = cc
 
 # The test target for cross-testing (running tests under Wine, etc).

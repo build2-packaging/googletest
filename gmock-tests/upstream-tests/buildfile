@@ -16,11 +16,16 @@ gmock_main_tests = gmock-actions_test \
 
 for test_name: $gmock_main_tests
 {
-  ./: exe{$test_name}: cxx{$test_name}
+  ./: exe{$test_name}: cxx{$test_name} hxx{**}
 }
 
-exe{gmock_link_test}: cxx{gmock_link_test gmock_link2_test} \
+exe{gmock_link_test}: cxx{gmock_link_test gmock_link2_test} hxx{**} \
                       $gmock_lib
-obj{gmock_link_test}: cxx.poptions += "-I$src_base"
-exe{gmock-spec-builders_test}: cxx{gmock-spec-builders_test} $gmock_lib
-exe{$gmock_main_tests}: $gmock_main_lib $gmock_lib
+cxx.poptions += "-I$src_base"
+exe{gmock-spec-builders_test}: cxx{gmock-spec-builders_test} hxx{**} $gmock_lib
+exe{$gmock_main_tests}: $gmock_lib $gmock_main_lib
+
+if ($cxx.id == 'msvc')
+{
+  cxx.coptions += -bigobj
+}

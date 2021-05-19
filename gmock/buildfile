@@ -1,3 +1,3 @@
 # gtest directory to be linked to compile gmock library
-./ : {*/ -build/ -gtest/}
+./ : {*/ -build/ -gtest/} manifest
 

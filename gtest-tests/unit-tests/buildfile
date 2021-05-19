@@ -37,7 +37,7 @@ all_tests_names = $test_names_with_gtest_main $test_names_with_gtest
 for test_name : $all_tests_names
 {
   # info "GTEST TEST: $test_name"
-  ./ : exe{$test_name} : cxx{$test_name} hxx{*}
+  ./ : exe{$test_name} : cxx{$test_name} hxx{**}
 }
 
 exe{*}:
