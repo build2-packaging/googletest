@@ -1,0 +1,14 @@
+
+import gtest_main = gtest%liba{gtest_main}
+import gtest_dynamic = gtest%libs{gtest}
+import gtest_static = gtest%liba{gtest}
+
+cxx{*main}: extension = cxx
+
+./ : exe{basic-gtest_dynamic_main} : cxx{no_main} $gtest_dynamic $gtest_main 
+./ : exe{basic-gtest_static_main}  : cxx{no_main} $gtest_static  $gtest_main 
+
+./ : exe{basic-gtest_dynamic}      : cxx{main}  	$gtest_dynamic
+./ : exe{basic-gtest_static}       : cxx{main}    $gtest_static
+
+

@@ -1,0 +1,6 @@
+project = gtest-samples
+
+using config
+using test
+using dist
+using version

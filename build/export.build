@@ -1,8 +1,0 @@
-$out_root/
-{
-  include gtest/
-  include gmock/
-}
-
-export $out_root/gtest/$import.target # Works for gtest but not gmock yet.
-

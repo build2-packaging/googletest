@@ -1,2 +1,3 @@
-./: { */ -build/ -upstream/ } manifest
+import pkgs = {gtest*/ gmock*/} 
 
+./: $pkgs

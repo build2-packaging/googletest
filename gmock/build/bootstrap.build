@@ -1,0 +1,6 @@
+project = gmock
+
+using config
+using version
+using install
+using dist

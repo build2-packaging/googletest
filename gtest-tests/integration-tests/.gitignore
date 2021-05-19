@@ -1,0 +1,5 @@
+# All linked executables
+basic-gtest/basic-gtest_dynamic
+basic-gtest/basic-gtest_dynamic_main
+basic-gtest/basic-gtest_static
+basic-gtest/basic-gtest_static_main

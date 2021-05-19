@@ -1,0 +1,27 @@
+import intf_libs = gtest%lib{gtest}
+
+pub = [dir_path] ../include/gmock
+include $pub
+pub_hdrs = $($pub/pub_hdrs)
+
+# Build options.
+out_pfx_inc = [dir_path] $out_root/include/
+src_pfx_inc = [dir_path] $src_root/include/
+out_pfx_src = [dir_path] $out_root/src/
+src_pfx_src = [dir_path] $src_root/src/
+
+cxx.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
+                "-I$out_pfx_inc" "-I$src_pfx_inc" "-I$src_root"
+
+lib{gmock}: $pub_hdrs
+lib{gmock}: cxx{gmock-all} $intf_libs
+lib{gmock}:
+{
+  cxx.export.poptions += "-I$out_pfx_inc" "-I$src_pfx_inc"
+  cxx.export.libs += $intf_libs
+}
+
+liba{gmock_main}: cxx{gmock_main} lib{gmock}
+liba{gmock_main}: bin.whole = true
+
+./: lib{gmock} liba{gmock_main}

@@ -1,0 +1,8 @@
+:1
+location: gtest/
+:
+location: gtest-tests/
+:
+location: gtest-samples/
+:
+location: gmock/
