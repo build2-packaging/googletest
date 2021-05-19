@@ -1,6 +1,6 @@
 : 1
 name: gtest-samples
-version: 1.8.1+5
+version: 1.10.0-a.0.z
 summary: "Googletest: Google Testing and Mocking Framework samples library"
 description: ../UPSTREAM.README.md
 license: MIT

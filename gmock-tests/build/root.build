@@ -1,0 +1,12 @@
+cxx.std = latest
+
+using cxx
+
+h{*}: extension = h
+cxx{*}: extension = cc
+
+# The test target for cross-testing (running tests under Wine, etc).
+#
+test.target = $cxx.target
+
+exe{*}: test = true

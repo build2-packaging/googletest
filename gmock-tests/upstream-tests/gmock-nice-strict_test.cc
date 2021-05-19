@@ -1,0 +1,1 @@
+../../upstream/googlemock/test/gmock-nice-strict_test.cc

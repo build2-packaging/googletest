@@ -9,26 +9,27 @@ import lib_gtest_main = gtest%liba{gtest_main}
 # Note: we reflect the content of CMake's scripts, which apparently do not take
 # all sources into account, so no loop.
 
-test_names_with_gtest_main =  googletest-death-test-test     \
-                              googletest-filepath-test       \
-                              googletest-linked-ptr-test     \
-                              gtest_main_unittest            \
-                              googletest-message-test        \
-                              googletest-options-test        \
-                              googletest-port-test           \
-                              gtest_pred_impl_unittest       \
-                              googletest-test-part-test      \
-                              gtest_unittest                 \
-                              gtest_sole_header_test         \
-                              googletest-printers-test
+test_names_with_gtest_main =  googletest-death-test-test           \
+                              googletest-filepath-test             \
+                              gtest_main_unittest                  \
+                              googletest-message-test              \
+                              googletest-options-test              \
+                              googletest-port-test                 \
+                              gtest_pred_impl_unittest             \
+                              googletest-test-part-test            \
+                              gtest_unittest                       \
+                              gtest_sole_header_test               \
+                              googletest-printers-test             \
+                              gtest_skip_test     
 
-test_names_with_gtest      =  gtest_environment_test         \
-                              gtest_no_test_unittest         \
-                              gtest_premature_exit_test      \
-                              gtest_repeat_test              \
-                              gtest_stress_test              \
-                              gtest_throw_on_failure_ex_test \
-                              gtest-unittest-api_test        \
+test_names_with_gtest      =  gtest_environment_test               \
+                              gtest_no_test_unittest               \
+                              gtest_premature_exit_test            \
+                              gtest_repeat_test                    \
+                              gtest_stress_test                    \
+                              gtest_throw_on_failure_ex_test       \
+                              gtest-unittest-api_test              \
+                              gtest_skip_in_environment_setup_test \
                               googletest-listener-test         # This one was linking with gtest_main in Cmake but it have a main() so it does not link.
 
 all_tests_names = $test_names_with_gtest_main $test_names_with_gtest

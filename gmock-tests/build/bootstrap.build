@@ -1,4 +1,4 @@
-project = gmock
+project = gmock-tests
 
 using config
 using version
