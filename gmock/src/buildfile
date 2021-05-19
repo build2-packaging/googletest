@@ -13,7 +13,7 @@ src_pfx_src = [dir_path] $src_root/src/
 cxx.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
                 "-I$out_pfx_inc" "-I$src_pfx_inc" "-I$src_root"
 
-lib{gmock}: $pub_hdrs
+lib{gmock}: $pub/{$pub_hdrs}
 lib{gmock}: cxx{gmock-all} $intf_libs
 lib{gmock}:
 {

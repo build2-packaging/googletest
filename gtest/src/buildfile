@@ -10,7 +10,7 @@ pub_hdrs = $($pub/pub_hdrs)
 ./ : lib{gtest} liba{gtest_main}
 
 # gtest : Google Test library to use in your tests.
-lib{gtest}: $pub_hdrs
+lib{gtest}: $pub/{$pub_hdrs}
 lib{gtest} : cxx{gtest-all} hxx{**}
 
 # Check inside gtest-all.cc: Looks like some kind of manual "unity build"...
