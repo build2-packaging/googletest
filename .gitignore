@@ -25,3 +25,8 @@
 *.pc
 samples/build/bootstrap/
 tests/build/bootstrap/
+
+
+# Potential build directories in the root
+/build-*
+/build
