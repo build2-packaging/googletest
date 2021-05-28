@@ -34,11 +34,12 @@ cxx.export.poptions += "-I$out_pfx_inc" "-I$src_pfx_inc"
 objs{gtest-all}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
 libs{gtest}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY=1
 liba{gtest}: cxx.export.poptions += # Required here to ensure liba{gtest} is always available
+lib{gtest}: cxx.export.poptions += "-I$out_pfx_inc" "-I$src_pfx_inc" # This is mandatory
 
 # gtest_main : library defining a main() so that you don't have to duplicate it in each program
 # We only support it as a static utility library (no content stripping).
 # Chain dependency to avoid GTEST_LINKED_AS_SHARED_LIBRARY=1
-liba{gtest_main}: obj{gtest_main}: cxx{gtest_main} 
+liba{gtest_main}: obj{gtest_main}: cxx{gtest_main}
 liba{gtest_main}: bin.whole = true  # Keep the definition of main()
 liba{gtest_main}: lib{gtest}
 
