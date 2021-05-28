@@ -13,12 +13,12 @@ src_pfx_src = [dir_path] $src_root/src/
 cxx.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
                 "-I$out_pfx_inc" "-I$src_pfx_inc" "-I$src_root"
 
-# Necessary to get include paths because object files are compiled without linking to the library                
-cxx.poptions += $($intf_libs: cxx.export.poptions)              
+# Necessary to get include paths because object files are compiled without linking to the library
+cxx.poptions += $($intf_libs: cxx.export.poptions)
 
 # Gmock
 lib{gmock}: $pub/{$pub_hdrs}
-lib{gmock}: obj{gmock-all}: cxx{gmock-all}
+lib{gmock}: cxx{gmock-all}
 lib{gmock}: cxx{* -gmock-all -gtest-port}: include = false
 objs{gmock-all}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
 cxx.export.poptions += $($intf_libs: cxx.export.poptions) \
@@ -32,8 +32,9 @@ objs{gtest-port}: cxx{gtest-port} h{**}
 
 lib{gmock}: $intf_libs
 libs{gmock}: cxx.export.libs += $intf_libs
+liba{gmock}: # FIXME: liba{gmock} doesn't seem to be generated until we try to define it's requirements (even if we do nothing)
 
-liba{gmock_main}: obj{gmock_main}: cxx{gmock_main}
+liba{gmock_main}: cxx{gmock_main}
 liba{gmock_main}: bin.whole = true
 liba{gmock_main}: lib{gmock}
 
