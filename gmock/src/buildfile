@@ -4,6 +4,7 @@ pub = [dir_path] ../include/gmock
 include $pub
 pub_hdrs = $($pub/pub_hdrs)
 
+
 # Build options.
 out_pfx_inc = [dir_path] $out_root/include/
 src_pfx_inc = [dir_path] $src_root/include/
@@ -31,6 +32,7 @@ libs{gmock}: objs{gtest-port}: include = ($cxx.id == 'msvc')
 objs{gtest-port}: cxx{gtest-port} h{**}
 
 lib{gmock}: $intf_libs
+libs{gmock}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY=1
 libs{gmock}: cxx.export.libs += $intf_libs
 liba{gmock}: # FIXME: liba{gmock} doesn't seem to be generated until we try to define it's requirements (even if we do nothing)
 
