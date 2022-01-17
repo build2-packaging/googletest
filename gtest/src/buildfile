@@ -1,0 +1,50 @@
+# Public headers.
+#
+pub = [dir_path] ../include/gtest/
+
+include $pub
+
+pub_hdrs = $($pub/pub_hdrs)
+
+## GTEST #############
+./ : lib{gtest} liba{gtest_main}
+
+# gtest : Google Test library to use in your tests.
+lib{gtest}: $pub/{$pub_hdrs}
+lib{gtest}: cxx{gtest-all} hxx{**}
+
+# Check inside gtest-all.cc: Looks like some kind of manual "unity build"...
+# All sources included must be mentionned as headers, even if it looks wrong.
+lib{gtest}: cxx{* -gtest-all -gtest_main}: include = false
+lib{gtest}: hxx{*}: install = false
+
+# Build options.
+out_pfx_inc = [dir_path] $out_root/include/
+src_pfx_inc = [dir_path] $src_root/include/
+out_pfx_src = [dir_path] $out_root/src/
+src_pfx_src = [dir_path] $src_root/src/
+
+cxx.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
+              "-I$out_pfx_inc" "-I$src_pfx_inc" "-I$src_root/"
+
+# DLL import/export symbol macros have to be activated/deactivated depending
+# on if you are building the dynamic library or linking with it.
+# Of course these special defines exists only if you use dynamic libraries.
+cxx.export.poptions += "-I$out_pfx_inc" "-I$src_pfx_inc"
+objs{gtest-all}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
+libs{gtest}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY=1
+liba{gtest}: cxx.export.poptions += # Required here to ensure liba{gtest} is always available
+
+# gtest_main : library defining a main() so that you don't have to duplicate it in each program
+# We only support it as a static utility library (no content stripping).
+# Chain dependency to avoid GTEST_LINKED_AS_SHARED_LIBRARY=1
+liba{gtest_main}: obj{gtest_main}: cxx{gtest_main} 
+liba{gtest_main}: bin.whole = true  # Keep the definition of main()
+liba{gtest_main}: lib{gtest}
+
+# Linking libs
+if ($cxx.target.class != 'windows') # Need pthread on Unix systems
+{
+  cxx.libs += -lpthread
+  libs{gtest}: cxx.export.libs += -lpthread
+}

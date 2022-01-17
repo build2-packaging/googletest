@@ -1,0 +1,12 @@
+: 1
+name: gtest-samples
+version: 1.10.0-a.0.z
+summary: "Googletest: Google Testing and Mocking Framework samples library"
+description: ../UPSTREAM.README.md
+license: MIT
+url: https://github.com/google/googletest
+package-url: https://github.com/Klaim/gtest-build2/
+package-email: mjklaim@gmail.com
+build-email: mjklaim@gmail.com
+depends: * build2 >= 0.13.0
+depends: * bpkg >= 0.13.0

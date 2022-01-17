@@ -1,5 +1,0 @@
-project = # unnamed for samples
-
-using config
-using test
-using dist

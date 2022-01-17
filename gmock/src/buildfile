@@ -1,0 +1,40 @@
+import intf_libs = gtest%lib{gtest}
+
+pub = [dir_path] ../include/gmock
+include $pub
+pub_hdrs = $($pub/pub_hdrs)
+
+# Build options.
+out_pfx_inc = [dir_path] $out_root/include/
+src_pfx_inc = [dir_path] $src_root/include/
+out_pfx_src = [dir_path] $out_root/src/
+src_pfx_src = [dir_path] $src_root/src/
+
+cxx.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
+                "-I$out_pfx_inc" "-I$src_pfx_inc" "-I$src_root"
+
+# Necessary to get include paths because object files are compiled without linking to the library                
+cxx.poptions += $($intf_libs: cxx.export.poptions)              
+
+# Gmock
+lib{gmock}: $pub/{$pub_hdrs}
+lib{gmock}: obj{gmock-all}: cxx{gmock-all}
+lib{gmock}: cxx{* -gmock-all -gtest-port}: include = false
+objs{gmock-all}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
+cxx.export.poptions += $($intf_libs: cxx.export.poptions) \
+                       "-I$out_pfx_inc" "-I$src_pfx_inc"
+
+# gtest-port is part of gtest which is coupled into gmock
+# Need to ensure to Scompile this part and not export any symbols from it
+# This object is only required on msvc when compiling shared libs
+libs{gmock}: objs{gtest-port}: include = ($cxx.id == 'msvc')
+objs{gtest-port}: cxx{gtest-port} h{**}
+
+lib{gmock}: $intf_libs
+libs{gmock}: cxx.export.libs += $intf_libs
+
+liba{gmock_main}: obj{gmock_main}: cxx{gmock_main}
+liba{gmock_main}: bin.whole = true
+liba{gmock_main}: lib{gmock}
+
+./: lib{gmock} liba{gmock_main}

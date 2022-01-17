@@ -1,0 +1,31 @@
+import gmock_lib = gmock%lib{gmock}
+import gmock_main_lib = gmock%liba{gmock_main}
+
+gmock_main_tests = gmock-actions_test \
+                   gmock-cardinalities_test \
+                   gmock_ex_test \
+                   gmock-generated-actions_test \
+                   gmock-generated-function-mockers_test \
+                   gmock-generated-matchers_test \
+                   gmock-internal-utils_test \
+                   gmock-matchers_test \
+                   gmock-more-actions_test \
+                   gmock-nice-strict_test \
+                   gmock-port_test \
+                   gmock_test
+
+for test_name: $gmock_main_tests
+{
+  ./: exe{$test_name}: cxx{$test_name} hxx{**}
+}
+
+exe{gmock_link_test}: cxx{gmock_link_test gmock_link2_test} hxx{**} \
+                      $gmock_lib
+cxx.poptions += "-I$src_base"
+exe{gmock-spec-builders_test}: cxx{gmock-spec-builders_test} hxx{**} $gmock_lib
+exe{$gmock_main_tests}: $gmock_lib $gmock_main_lib
+
+if ($cxx.id == 'msvc')
+{
+  cxx.coptions += -bigobj
+}

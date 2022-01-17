@@ -1,0 +1,7 @@
+project = gtest-tests
+
+using config
+using test
+using dist
+using version
+using install
