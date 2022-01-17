@@ -31,8 +31,9 @@ cxx.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
 # on if you are building the dynamic library or linking with it.
 # Of course these special defines exists only if you use dynamic libraries.
 cxx.export.poptions += "-I$out_pfx_inc" "-I$src_pfx_inc"
-objs{gtest-all}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
-libs{gtest}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY=1
+objs{*}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
+# libs{gtest}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY=1
+
 liba{gtest}: cxx.export.poptions += # Required here to ensure liba{gtest} is always available
 lib{gtest}: cxx.export.poptions += "-I$out_pfx_inc" "-I$src_pfx_inc" # This is mandatory
 

@@ -21,8 +21,9 @@ cxx.poptions += $($intf_libs: cxx.export.poptions)
 lib{gmock}: $pub/{$pub_hdrs}
 lib{gmock}: cxx{gmock-all}
 lib{gmock}: cxx{* -gmock-all -gtest-port}: include = false
-objs{gmock-all}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
-cxx.export.poptions += $($intf_libs: cxx.export.poptions) \
+lib{gmock}: $intf_libs
+objs{*}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
+lib{*}: cxx.export.poptions += $($intf_libs: cxx.export.poptions) \
                        "-I$out_pfx_inc" "-I$src_pfx_inc"
 
 # gtest-port is part of gtest which is coupled into gmock
@@ -31,7 +32,6 @@ cxx.export.poptions += $($intf_libs: cxx.export.poptions) \
 libs{gmock}: objs{gtest-port}: include = ($cxx.id == 'msvc')
 objs{gtest-port}: cxx{gtest-port} h{**}
 
-lib{gmock}: $intf_libs
 libs{gmock}: cxx.export.poptions += -DGTEST_LINKED_AS_SHARED_LIBRARY=1
 libs{gmock}: cxx.export.libs += $intf_libs
 liba{gmock}: # FIXME: liba{gmock} doesn't seem to be generated until we try to define it's requirements (even if we do nothing)
