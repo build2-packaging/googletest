@@ -1,11 +1,11 @@
 : 1
 name: gmock
 version: 1.11.0-a.0.z
-summary: "Googletest: Google Testing and Mocking Framework"
-description: ../UPSTREAM.README.md
+summary: Google Mocking Framework
+description-file: README.md
 license: MIT
 url: https://github.com/google/googletest
-package-url: https://github.com/Klaim/gtest-build2/
+package-url: https://github.com/build2-packaging/googletest/
 package-email: mjklaim@gmail.com
 build-email: mjklaim@gmail.com
 tests: gmock-tests == $

@@ -4,3 +4,7 @@ using cxx
 
 hxx{*}: extension = h
 cxx{*}: extension = cc
+
+exe{*}: test = true
+
+test.target = $cxx.target

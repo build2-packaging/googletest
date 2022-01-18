@@ -1,0 +1,8 @@
+import libs = gtest%liba{gtest_main}
+
+cxx.poptions += "-I$src_base"
+
+exe{driver}: test/cxx{gtest_all_test} hxx{**} $libs
+exe{driver}: test/cxx{** -gtest_all_test}: include = false
+
+exe{driver}: test.options = --gtest_filter=-OutputFileHelpersTest.GetCurrentExecutableName

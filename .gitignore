@@ -1,17 +1,26 @@
-.bdep/
-
 # IDE
 .vscode
 .vs
+
+.bdep/
+
+# Local default options files.
+#
+.build2/local/
 
 # Compiler/linker output.
 #
 *.d
 *.t
 *.i
+*.i.*
 *.ii
+*.ii.*
 *.o
 *.obj
+*.gcm
+*.pcm
+*.ifc
 *.so
 *.dll
 *.a
@@ -23,5 +32,3 @@
 *.exe.dlls/
 *.exe.manifest
 *.pc
-samples/build/bootstrap/
-tests/build/bootstrap/
