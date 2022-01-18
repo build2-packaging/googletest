@@ -5,4 +5,10 @@ cxx.poptions += "-I$src_base"
 exe{driver}: test/cxx{gtest_all_test} hxx{**} $libs
 exe{driver}: test/cxx{** -gtest_all_test}: include = false
 
+# C1128: number of sections exceeded object file format limit: compile with
+# /bigobj
+#
+if ($cxx.id == 'msvc')
+  test/obje{gtest_all_test}: cxx.coptions += /bigobj
+
 exe{driver}: test.options = --gtest_filter=-OutputFileHelpersTest.GetCurrentExecutableName
