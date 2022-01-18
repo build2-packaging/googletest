@@ -1,14 +1,14 @@
 : 1
 name: gtest
 version: 1.11.0-a.0.z
-summary: "Googletest: Google Testing and Mocking Framework"
-description: ../UPSTREAM.README.md
-license: MIT
-url: https://github.com/google/googletest
-package-url: https://github.com/Klaim/gtest-build2/
+summary: Google Testing Framework
+description-file: README.md
+license: BSD-3-Clause
+url: https://google.github.io/googletest/
+doc-url: https://google.github.io/googletest/
+src-url: https://github.com/google/googletest
+package-url: https://github.com/build2-packaging/googletest/
 package-email: mjklaim@gmail.com
-build-email: mjklaim@gmail.com
-tests: gtest-tests == $
-examples: gtest-samples == $
+build-error-email: mjklaim@gmail.com
 depends: * build2 >= 0.14.0
 depends: * bpkg >= 0.14.0
