@@ -1,0 +1,39 @@
+gmock requires patching because it uses the same symbol exporting macro
+(GTEST_API_) as gtest. This makes it impossible to have the gmock library
+depend on gtest on Windows. See the following upstream bug report for
+details:
+
+https://github.com/google/googletest/issues/3738
+
+The patching procedure is as follows:
+
+1. Instead of symlink'ing gmock headers and source, copy them.
+
+2. Run the following command to replace GTEST_API_ with GMOCK_API_:
+
+find src include -name 'gmock*.h' -o -name 'gmock*.cc' | \
+  xargs -n 1 sed -i -e 's/GTEST_API_/GMOCK_API_/g'
+
+3. Copy the following fragment to include/gmock/internal/gmock-port.h
+   before any existing macro definitions (this is similar to gtest-port.h):
+
+// GMOCK_API_ qualifies all symbols that must be exported. The definitions below
+// are guarded by #ifndef to give embedders a chance to define GMOCK_API_ in
+// gmock/internal/custom/gtest-port.h
+#ifndef GMOCK_API_
+
+#ifdef _MSC_VER
+# if GMOCK_LINKED_AS_SHARED_LIBRARY
+#  define GMOCK_API_ __declspec(dllimport)
+# elif GMOCK_CREATE_SHARED_LIBRARY
+#  define GMOCK_API_ __declspec(dllexport)
+# endif
+#elif __GNUC__ >= 4 || defined(__clang__)
+# define GMOCK_API_ __attribute__((visibility ("default")))
+#endif  // _MSC_VER
+
+#endif  // GMOCK_API_
+
+#ifndef GMOCK_API_
+# define GMOCK_API_
+#endif  // GMOCK_API_
