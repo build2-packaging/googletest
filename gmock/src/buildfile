@@ -1,40 +1,65 @@
 import intf_libs = gtest%lib{gtest}
 
-pub = [dir_path] ../include/gmock
+# Public headers.
+#
+pub = [dir_path] ../include/gmock/
+
 include $pub
-pub_hdrs = $($pub/pub_hdrs)
+
+pub_hdrs = $($pub/ pub_hdrs)
+
+# Libraries.
+#
+./: lib{gmock} liba{gmock_main}
+
+lib{gmock}: {hxx cxx}{* -gmock_main} $pub/{$pub_hdrs} $intf_libs
+
+# Provide custom obja{} to avoid synthesized dependency on lib{gmock} and
+# -DGMOCK_LINKED_AS_SHARED_LIBRARY that it brings. But we do need lib{gtest}.
+#
+liba{gmock_main}: obja{gmock_main} lib{gmock}
+obja{gmock_main}: cxx{gmock_main} $intf_libs
+
+# Defines main() so link in the whole archive mode.
+#
+liba{gmock_main}: bin.whole = true
 
 # Build options.
-out_pfx_inc = [dir_path] $out_root/include/
+#
+# Note that the source files include internal headers as "src/...".
+#
 src_pfx_inc = [dir_path] $src_root/include/
-out_pfx_src = [dir_path] $out_root/src/
-src_pfx_src = [dir_path] $src_root/src/
+src_pfx_src = [dir_path] $src_root
 
-cxx.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
-                "-I$out_pfx_inc" "-I$src_pfx_inc" "-I$src_root"
+cxx.poptions =+ "-I$src_pfx_src" "-I$src_pfx_inc"
 
-# Necessary to get include paths because object files are compiled without linking to the library                
-cxx.poptions += $($intf_libs: cxx.export.poptions)              
+{hbmis objs}{*}: cxx.poptions += -DGMOCK_CREATE_SHARED_LIBRARY=1
 
-# Gmock
-lib{gmock}: $pub/{$pub_hdrs}
-lib{gmock}: obj{gmock-all}: cxx{gmock-all}
-lib{gmock}: cxx{* -gmock-all -gtest-port}: include = false
-objs{gmock-all}: cxx.poptions += -DGTEST_CREATE_SHARED_LIBRARY=1
-cxx.export.poptions += $($intf_libs: cxx.export.poptions) \
-                       "-I$out_pfx_inc" "-I$src_pfx_inc"
+# Export options.
+#
+lib{gmock}:
+{
+  cxx.export.poptions = "-I$src_pfx_inc"
+  cxx.export.libs = $intf_libs
+}
 
-# gtest-port is part of gtest which is coupled into gmock
-# Need to ensure to Scompile this part and not export any symbols from it
-# This object is only required on msvc when compiling shared libs
-libs{gmock}: objs{gtest-port}: include = ($cxx.id == 'msvc')
-objs{gtest-port}: cxx{gtest-port} h{**}
+libs{gmock}: cxx.export.poptions += -DGMOCK_LINKED_AS_SHARED_LIBRARY=1
 
-lib{gmock}: $intf_libs
-libs{gmock}: cxx.export.libs += $intf_libs
+liba{gmock_main}:
+{
+  cxx.export.poptions = "-I$src_pfx_inc"
+  cxx.export.libs = lib{gmock}
+}
 
-liba{gmock_main}: obj{gmock_main}: cxx{gmock_main}
-liba{gmock_main}: bin.whole = true
-liba{gmock_main}: lib{gmock}
+# For pre-releases use the complete version to make sure they cannot be used
+# in place of another pre-release or the final version. See the version module
+# for details on the version.* variable values.
+#
+if $version.pre_release
+  lib{gmock}: bin.lib.version = "-$version.project_id"
+else
+  lib{gmock}: bin.lib.version = "-$version.major.$version.minor"
 
-./: lib{gmock} liba{gmock_main}
+# Don't install private headers.
+#
+hxx{*}: install = false
