@@ -1,0 +1,6 @@
+: 1
+name: gmock
+version: 1.11.0+1
+project: googletest
+summary: Google Mocking Framework
+license: BSD-3-Clause
