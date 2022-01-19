@@ -1,1 +1,0 @@
-../../upstream/googlemock/src/gmock-all.cc
